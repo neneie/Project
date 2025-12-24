@@ -1,17 +1,15 @@
 ﻿<Router AppAssembly="@typeof(Program).Assembly">
     <Found Context="routeData">
-        <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(Layout.MainLayout)">
-            <NotAuthorized>
-                @if (context.User.Identity?.IsAuthenticated != true)
-                {
-                    <RedirectToLogin />
-                }
-                else
-                {
-                    <p role="alert">У вас нет доступа к этой странице.</p>
-                }
-            </NotAuthorized>
-        </AuthorizeRouteView>
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
         <FocusOnNavigate RouteData="@routeData" Selector="h1" />
     </Found>
+    <NotFound>
+        <PageTitle>Not found</PageTitle>
+        <LayoutView Layout="@typeof(MainLayout)">
+            <div class="alert alert-danger">
+                <h1>Страница не найдена</h1>
+                <p>Sorry, there's nothing at this address.</p>
+            </div>
+        </LayoutView>
+    </NotFound>
 </Router>

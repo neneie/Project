@@ -1,114 +1,128 @@
-.navbar-toggler {
-    appearance: none;
-    cursor: pointer;
-    width: 3.5rem;
-    height: 2.5rem;
-    color: white;
-    position: absolute;
-    top: 0.5rem;
-    right: 1rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255,255,255,0.55%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") no-repeat center/1.75rem rgba(255, 255, 255, 0.1);
-}
-
-    .navbar-toggler:checked {
-        background-color: rgba(255, 255, 255, 0.5);
-    }
-
-.top-row {
-    height: 3.5rem;
-    background-color: rgba(0,0,0,.4);
-}
-
-.navbar-brand {
-    font-size: 1.1rem;
-    color: white !important;
-}
-
-.bi {
-    display: inline-block;
-    position: relative;
-    width: 1.25rem;
-    height: 1.25rem;
-    margin-right: 0.75rem;
-    top: -1px;
-}
-
-.nav-item {
-    font-size: 0.9rem;
-    padding-bottom: 0.5rem;
-}
-
-    .nav-item:first-of-type {
-        padding-top: 1rem;
-    }
-
-    .nav-item:last-of-type {
-        padding-bottom: 1rem;
-    }
-
-.nav-link {
-    color: white !important;
-    background: none;
-    border: none;
-    border-radius: 4px;
-    height: 3rem;
+.nav-menu {
+    background: linear-gradient(180deg, rgb(5, 39, 103) 0%, #3a0647 70%);
+    height: 100%;
     display: flex;
-    align-items: center;
-    line-height: 3rem;
-    width: 100%;
-    font-size: 1rem;
-    font-weight: 500;
-    padding: 0 1rem;
+    flex-direction: column;
+    color: #ffffff !important;
+    font-family: "Segoe UI", Arial, sans-serif;
+    font-size: 17px;
 }
 
-    .nav-link:hover {
-        background-color: rgba(255,255,255,.1);
-        color: white;
+.navbar-internal {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.nav-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 1rem 0;
+}
+
+.app-title {
+    color: #ffffff !important;
+    margin: 0 1rem 1.5rem 1rem;
+    font-size: 20px;
+    font-weight: 600;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+    padding-bottom: 1rem;
+}
+
+.nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex: 1;
+}
+
+    .nav-list li {
+        padding: 0.3rem 0.3rem;
+    }
+
+.nav-link,
+.profile-link,
+.auth-link,
+.logout-btn {
+    display: block;
+    width: 100%;
+    text-align: left;
+    text-decoration: none;
+    background-color: transparent;
+    color: #ffffff !important;
+    border-radius: 6px;
+    padding: 0.7rem 1rem;
+    border: 1px solid transparent;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+    .nav-link:hover,
+    .profile-link:hover,
+    .auth-link:hover,
+    .logout-btn:hover {
+        background-color: rgba(255, 255, 255, 0.18);
+        border-color: rgba(255, 255, 255, 0.25);
+        color: #ffffff !important;
     }
 
     .nav-link.active {
-        background-color: rgba(255,255,255,.25);
-        color: white;
+        background-color: rgba(255, 255, 255, 0.28);
+        border-color: rgba(255, 255, 255, 0.35);
+        color: #ffffff !important;
     }
 
-.nav-form {
-    width: 100%;
-    margin: 0;
-    padding: 0;
+.nav-footer {
+    padding: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    margin-top: auto;
 }
 
-    .nav-form .nav-link {
+.user-profile {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.user-info {
+    flex: 1;
+}
+
+.user-name {
+    color: #ffffff !important;
+    font-size: 15px;
+    margin: 0 0 0.4rem 0;
+    word-break: break-word;
+    font-weight: 500;
+}
+
+.auth-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.auth-link.login {
+    border-color: rgba(255, 255, 255, 0.25);
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+.auth-link.register {
+    border-color: rgba(52, 152, 219, 0.9);
+    background-color: rgba(52, 152, 219, 0.7);
+}
+
+@media (max-width: 640px) {
+    .nav-menu {
         width: 100%;
-        padding: 0 1rem;
-        margin: 0;
-        background: none;
-        border: none;
-        text-align: left;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
+        height: auto;
     }
 
-        .nav-form .nav-link:hover {
-            background-color: rgba(255,255,255,.1);
-        }
-
-.nav-scrollable {
-    display: none;
-}
-
-.navbar-toggler:checked ~ .nav-scrollable {
-    display: block;
-}
-
-@media (min-width: 641px) {
-    .navbar-toggler {
+    .app-title {
         display: none;
-    }
-
-    .nav-scrollable {
-        display: block;
-        overflow-y: auto;
     }
 }

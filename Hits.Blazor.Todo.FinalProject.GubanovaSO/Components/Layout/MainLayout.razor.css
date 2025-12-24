@@ -6,6 +6,7 @@
 
 main {
     flex: 1;
+    background-color: white;
 }
 
 .sidebar {
@@ -19,12 +20,14 @@ main {
     height: 3.5rem;
     display: flex;
     align-items: center;
+    color: #333;
 }
 
     .top-row ::deep a, .top-row ::deep .btn-link {
         white-space: nowrap;
         margin-left: 1.5rem;
         text-decoration: none;
+        color: #333;
     }
 
         .top-row ::deep a:hover, .top-row ::deep .btn-link:hover {
@@ -35,6 +38,10 @@ main {
             overflow: hidden;
             text-overflow: ellipsis;
         }
+
+.content {
+    color: #333;
+}
 
 @media (max-width: 640.98px) {
     .top-row {

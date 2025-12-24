@@ -1,45 +1,67 @@
-﻿<div class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="/">Курсы</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <NavLink class="nav-link" href="/" Match="NavLinkMatch.All">Главная</NavLink>
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<div class="nav-menu">
+    <nav class="navbar-internal">
+        <div class="nav-container">
+            <h3 class="app-title">Курсы</h3>
+
+            <ul class="nav-list">
+                <li>
+                    <NavLink class="nav-link" href="/" Match="NavLinkMatch.All">
+                        Главная
+                    </NavLink>
                 </li>
-                <li class="nav-item">
-                    <NavLink class="nav-link" href="courses">Курсы</NavLink>
+                <li>
+                    <NavLink class="nav-link" href="courses">
+                        Курсы
+                    </NavLink>
                 </li>
+
                 <AuthorizeView>
                     <Authorized>
-                        <li class="nav-item">
-                            <NavLink class="nav-link" href="my-learning">Мои курсы</NavLink>
+                        <li>
+                            <NavLink class="nav-link" href="my-learning">
+                                Мои курсы
+                            </NavLink>
                         </li>
-                        <li class="nav-item">
-                            <NavLink class="nav-link" href="courses/create">Создать</NavLink>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="Account/Profile">Профиль</a>
-                        </li>
-                        <li class="nav-item">
-                            <form action="Account/Logout" method="post" style="display:inline;">
-                                <AntiforgeryToken />
-                                <button type="submit" class="nav-link btn btn-link text-decoration-none">Выход</button>
-                            </form>
+                        <li>
+                            <NavLink class="nav-link" href="courses/create">
+                                Создать курс
+                            </NavLink>
                         </li>
                     </Authorized>
-                    <NotAuthorized>
-                        <li class="nav-item">
-                            <NavLink class="nav-link" href="Account/Register">Регистрация</NavLink>
-                        </li>
-                        <li class="nav-item">
-                            <NavLink class="nav-link" href="Account/Login">Вход</NavLink>
-                        </li>
-                    </NotAuthorized>
                 </AuthorizeView>
             </ul>
+
+            <div class="nav-footer">
+                <AuthorizeView>
+                    <Authorized>
+                        <div class="user-profile">
+                            <div class="user-info">
+                                <p class="user-name">@context.User.Identity?.Name</p>
+                                <NavLink class="profile-link" href="Account/Profile">
+                                    Профиль
+                                </NavLink>
+                            </div>
+                            <form action="Account/Logout" method="post">
+                                <AntiforgeryToken />
+                                <button type="submit" class="logout-btn">Выход</button>
+                            </form>
+                        </div>
+                    </Authorized>
+                    <NotAuthorized>
+                        <div class="auth-buttons">
+                            <NavLink class="auth-link login" href="Account/Login">
+                                Вход
+                            </NavLink>
+                            <NavLink class="auth-link register" href="Account/Register">
+                                Регистрация
+                            </NavLink>
+                        </div>
+                    </NotAuthorized>
+                </AuthorizeView>
+            </div>
         </div>
-    </div>
+    </nav>
 </div>
