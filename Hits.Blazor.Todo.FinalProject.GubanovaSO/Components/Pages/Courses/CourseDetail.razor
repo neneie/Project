@@ -1,108 +1,79 @@
-﻿﻿
-@page "/courses/{CourseId:int}"
+﻿@page "/courses/{CourseId:int}"
 @using Hits.Blazor.Todo.FinalProject.GubanovaSO.Models
 @using Hits.Blazor.Todo.FinalProject.GubanovaSO.Data.Services
 @using Microsoft.AspNetCore.Components.Authorization
 @inject CourseService CourseService
 @inject EnrollmentService EnrollmentService
-@inject NavigationManager Navigation
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
-<PageTitle>@(course?.Title ?? "Курс") - Образовательная платформа</PageTitle>
+<PageTitle>@(course?.Title ?? "Курс")</PageTitle>
 
-@if (course == null)
-{
-    <div class="container mt-4">
+<div class="container py-4">
+    @if (course == null)
+    {
         <div class="alert alert-danger">Курс не найден</div>
-        <a href="/courses" class="btn btn-primary">Вернуться</a>
-    </div>
-}
-else
-{
-    <div class="container mt-4">
+        <a href="/courses" class="btn btn-primary">Назад к курсам</a>
+    }
+    else
+    {
         <div class="row">
-            <div class="col-lg-8">
+            <div class="col-md-8">
                 <h2>@course.Title</h2>
-                <p class="text-muted">@course.Category | @course.DurationHours часов | Уровень: @course.DifficultyLevel</p>
+                <p class="text-muted">@course.Category | @course.DurationHours ч</p>
 
                 <h4 class="mt-4">Описание</h4>
                 <p>@course.Description</p>
 
-                <h4 class="mt-4">Описание</h4>
-                <p>@course.Description</p>
-
-                <h4 class="mt-4">Содержание курса</h4>
-                @if (string.IsNullOrWhiteSpace(course.Content))
-                {
-                    <p class="text-muted">Содержание не заполнено</p>
-                }
-                else
-                {
-                    <div class="card">
-                        <div class="card-body">
-                            @((MarkupString)course.Content.Replace("\n", "<br />"))
-                        </div>
-                    </div>
-                }
-
+                <h4 class="mt-4">Содержание</h4>
+                <div class="card card-body">
+                    @if (string.IsNullOrWhiteSpace(course.Content))
+                    {
+                        <p class="text-muted">Содержание не добавлено</p>
+                    }
+                    else
+                    {
+                        @((MarkupString)course.Content.Replace("\n", "<br />"))
+                    }
+                </div>
             </div>
 
-            <div class="col-lg-4">
+            <div class="col-md-4">
                 <div class="card">
                     <div class="card-header">
-                        Информация
+                        <strong>Информация</strong>
                     </div>
                     <div class="card-body">
                         <p><strong>Категория:</strong> @course.Category</p>
                         <p><strong>Часов:</strong> @course.DurationHours</p>
-                        <p><strong>Уровень сложности:</strong> @course.DifficultyLevel</p>
+                        <p><strong>Уровень:</strong> @course.DifficultyLevel</p>
                     </div>
                     <div class="card-footer">
-                        @if (errorMessage != null)
-                        {
-                            <div class="alert alert-danger alert-sm">@errorMessage</div>
-                        }
-
-                        @if (successMessage != null)
-                        {
-                            <div class="alert alert-success alert-sm">@successMessage</div>
-                        }
-
                         <AuthorizeView>
                             <Authorized>
                                 @if (isEnrolled)
                                 {
-                                    <button class="btn btn-primary w-100" disabled>Вы уже записаны</button>
+                                    <button class="btn btn-secondary w-100" disabled>Вы записаны</button>
                                 }
                                 else
                                 {
-                                    <button class="btn btn-success w-100" @onclick="EnrollCourse" disabled="@isLoading">
-                                        @if (isLoading)
-                                        {
-                                            <span>Записываю...</span>
-                                        }
-                                        else
-                                        {
-                                            <span>Записаться</span>
-                                        }
-                                    </button>
+                                    <form method="post" action="/api/enroll">
+                                        <input type="hidden" name="courseId" value="@CourseId" />
+                                        <button type="submit" class="btn btn-success w-100">Записаться</button>
+                                    </form>
                                 }
                             </Authorized>
                             <NotAuthorized>
-                                <a href="/Account/Login" class="btn btn-primary w-100">Войти</a>
+                                <a href="/Account/Login" class="btn btn-primary w-100">Вход</a>
                             </NotAuthorized>
                         </AuthorizeView>
-
                     </div>
                 </div>
+
+                <a href="/courses" class="btn btn-outline-primary w-100 mt-3">Назад</a>
             </div>
         </div>
-
-        <div class="mt-4">
-            <a href="/courses" class="btn btn-primary">Вернуться к курсам</a>
-        </div>
-    </div>
-}
+    }
+</div>
 
 @code {
     [Parameter]
@@ -110,69 +81,22 @@ else
 
     private Course? course;
     private bool isEnrolled = false;
-    private bool isLoading = false;
-    private string? userId;
-    private string? errorMessage;
-    private string? successMessage;
 
     protected override async Task OnInitializedAsync()
     {
-        try
+        course = await CourseService.GetCourseByIdAsync(CourseId);
+
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity?.IsAuthenticated == true && course != null)
         {
-            course = await CourseService.GetCourseByIdAsync(CourseId);
-
-            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-            var user = authState.User;
-
-            if (user.Identity?.IsAuthenticated == true)
+            var userId = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (!string.IsNullOrEmpty(userId))
             {
-                userId = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-
-                if (!string.IsNullOrEmpty(userId) && course != null)
-                {
-                    var enrollment = await EnrollmentService.GetEnrollmentAsync(userId, CourseId);
-                    isEnrolled = enrollment != null;
-                }
+                var enrollment = await EnrollmentService.GetEnrollmentAsync(userId, CourseId);
+                isEnrolled = enrollment != null;
             }
         }
-        catch (Exception ex)
-        {
-            errorMessage = "Ошибка: " + ex.Message;
-        }
     }
-
-    private async Task EnrollCourse()
-    {
-        if (string.IsNullOrEmpty(userId))
-        {
-            return;
-        }
-
-        try
-        {
-            isLoading = true;
-            StateHasChanged();
-
-            var enrollmentId = await EnrollmentService.EnrollUserAsync(userId, CourseId);
-
-            if (enrollmentId > 0)
-            {
-                isEnrolled = true;
-                StateHasChanged();
-
-                await Task.Delay(1000);
-                Navigation.NavigateTo("/my-learning");
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Ошибка записи: {ex.Message}");
-        }
-        finally
-        {
-            isLoading = false;
-        }
-    }
-
-    
 }

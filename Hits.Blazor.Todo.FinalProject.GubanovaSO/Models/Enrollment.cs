@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 namespace Hits.Blazor.Todo.FinalProject.GubanovaSO.Models
@@ -21,6 +22,7 @@ namespace Hits.Blazor.Todo.FinalProject.GubanovaSO.Models
         public bool IsCompleted { get; set; } = false;
 
         [JsonIgnore]
+        [ForeignKey("CourseId")]
         public Course? Course { get; set; }
     }
 }

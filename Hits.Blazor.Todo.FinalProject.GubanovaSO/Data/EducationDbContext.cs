@@ -12,18 +12,16 @@ namespace Hits.Blazor.Todo.FinalProject.GubanovaSO.Data
 
         public DbSet<Course> Courses { get; set; }
         public DbSet<Enrollment> Enrollments { get; set; }
-        public DbSet<UserProgress> UserProgresses { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<Enrollment>()
-                .HasIndex(e => new { e.UserId, e.CourseId })
-                .IsUnique();
-        
-            modelBuilder.Entity<UserProgress>()
-                .HasIndex(up => new { up.UserId, up.LessonId });
+                .HasOne(e => e.Course)
+                .WithMany(c => c.Enrollments)
+                .HasForeignKey(e => e.CourseId)
+                .OnDelete(DeleteBehavior.Cascade);
 
         }
     }

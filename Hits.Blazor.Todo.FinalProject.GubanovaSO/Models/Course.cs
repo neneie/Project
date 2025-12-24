@@ -6,33 +6,32 @@ namespace Hits.Blazor.Todo.FinalProject.GubanovaSO.Models
     {
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "Название обязательно")]
-        [StringLength(200, MinimumLength = 3, ErrorMessage = "Название должно быть от 3 до 200 символов")]
+        [StringLength(200)]
         public string Title { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Описание обязательно")]
-        [StringLength(2000, MinimumLength = 10, ErrorMessage = "Описание должно быть от 10 до 2000 символов")]
-        public string Description { get; set; } = string.Empty;
+        [StringLength(2000)]
+        public string? Description { get; set; }
 
-        public string Category { get; set; } = string.Empty;
+        [StringLength(5000)]
+        public string? Content { get; set; }
 
+        [StringLength(100)]
+        public string? Category { get; set; }
 
-        [Range(1, 3, ErrorMessage = "Выберите уровень сложности")]
+        [Range(1, 1000)]
+        public int DurationHours { get; set; } = 1;
+
+        [Range(1, 3)]
         public int DifficultyLevel { get; set; } = 1;
-
-        public int DurationHours { get; set; }
 
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
         public DateTime? UpdatedDate { get; set; }
 
-        [Required]
-        public string InstructorId { get; set; } = string.Empty;
+        public string? InstructorId { get; set; }
 
         public bool IsActive { get; set; } = true;
 
         public ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
-        public string Content { get; set; } = string.Empty;
-
     }
 }

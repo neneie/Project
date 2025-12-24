@@ -23,6 +23,11 @@ builder.Services.AddDbContext<EducationDbContext>(options =>
 builder.Services.AddScoped<CourseService>();
 builder.Services.AddScoped<LessonService>();
 builder.Services.AddScoped<EnrollmentService>();
+builder.Services.AddScoped<CourseService>();
+builder.Services.AddScoped<EnrollmentService>();
+builder.Services.AddControllers();
+
+
 
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<AuthenticationStateProvider, PersistingRevalidatingAuthenticationStateProvider>();
@@ -61,8 +66,10 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseAntiforgery();
 
+app.MapControllers();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
+
 
 app.MapPost("/Account/Logout", async (SignInManager<ApplicationUser> signInManager) =>
 {

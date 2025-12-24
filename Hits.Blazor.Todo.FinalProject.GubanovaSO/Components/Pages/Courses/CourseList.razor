@@ -1,48 +1,49 @@
-﻿﻿
-@page "/courses"
+﻿@page "/courses"
 @using Hits.Blazor.Todo.FinalProject.GubanovaSO.Models
 @using Hits.Blazor.Todo.FinalProject.GubanovaSO.Data.Services
-@inject CourseService courseService
-@inject NavigationManager navigate
+@using Microsoft.AspNetCore.Components.Authorization
+@inject CourseService CourseService
+@inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <PageTitle>Курсы</PageTitle>
 
-<h1>Курсы</h1>
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Курсы</h2>
+        <AuthorizeView>
+            <Authorized>
+                <a href="/courses/create" class="btn btn-primary">Новый курс</a>
+            </Authorized>
+        </AuthorizeView>
+    </div>
 
-<div class="container">
     @if (courses == null)
     {
-        <p>Loading ...</p>
+        <p>Загрузка курсов...</p>
+    }
+    else if (courses.Count == 0)
+    {
+        <div class="alert alert-info">Курсов нет</div>
     }
     else
     {
-        <AuthorizeView>
-            <Authorized>
-                <div class="btn-group m-2">
-                    <button class="btn btn-primary" @onclick="AddCourse">Новый курс</button>
-                </div>
-            </Authorized>
-        </AuthorizeView>
-
-        <div class="card-group">
+        <div class="row">
             @foreach (var course in courses)
             {
-                <div class="card">
-                    <div class="card-header">
-                        @course.Title
-                    </div>
-                    <div class="card-body">
-                        <p>@course.Description</p>
-                        <p class="text-muted small">@course.Category | @course.DurationHours часов</p>
-                    </div>
-                    <div class="card-footer">
-                        <a class="btn btn-primary" href="courses/@course.Id">Подробнее</a>
-                        <AuthorizeView>
-                            <Authorized>
-                                <a class="btn btn-primary" href="courses/edit/@course.Id">Изменить</a>
-                                <button class="btn btn-danger" @onclick="async () => await DeleteCourse(course.Id)">Удалить</button>
-                            </Authorized>
-                        </AuthorizeView>
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <strong>@course.Title</strong>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted small">@course.Category | @course.DurationHours ч | Уровень: @course.DifficultyLevel</p>
+                            <p class="small">@(course.Description?.Substring(0, Math.Min(100, course.Description?.Length ?? 0)) ?? "")...</p>
+                        </div>
+                        <div class="card-footer">
+                            <a href="/courses/@course.Id" class="btn btn-sm btn-primary">Подробнее</a>
+                            <a href="/courses/edit/@course.Id" class="btn btn-sm btn-warning">Изменить</a>
+                        </div>
                     </div>
                 </div>
             }
@@ -51,22 +52,10 @@
 </div>
 
 @code {
-    List<Course>? courses;
+    private List<Course>? courses;
 
     protected override async Task OnInitializedAsync()
     {
-        await base.OnInitializedAsync();
-        courses = await courseService.GetAllCoursesAsync();
-    }
-
-    void AddCourse()
-    {
-        navigate.NavigateTo("courses/create");
-    }
-
-    async Task DeleteCourse(int id)
-    {
-        await courseService.DeleteCourseAsync(id);
-        courses = await courseService.GetAllCoursesAsync();
+        courses = await CourseService.GetAllCoursesAsync();
     }
 }

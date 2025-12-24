@@ -3,68 +3,64 @@
 @using Hits.Blazor.Todo.FinalProject.GubanovaSO.Models
 @using Hits.Blazor.Todo.FinalProject.GubanovaSO.Data.Services
 @using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
 @inject EnrollmentService EnrollmentService
-@inject NavigationManager Navigation
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
-<PageTitle>Мои курсы - Образовательная платформа</PageTitle>
+<PageTitle>Мои курсы</PageTitle>
 
-<h1>Мои курсы</h1>
+<div class="container py-4">
+    <h2>Мои курсы</h2>
 
-<div class="container">
     @if (enrollments == null)
     {
         <p>Загрузка...</p>
     }
     else if (enrollments.Count == 0)
     {
-        <div class="card">
-            <div class="card-body">
-                <p>Вы не записаны ни на один курс</p>
-            </div>
-            <div class="card-footer">
-                <a href="/courses" class="btn btn-primary">Выбрать курс</a>
-            </div>
+        <div class="alert alert-info">
+            Вы не записаны ни на один курс
         </div>
+        <a href="/courses" class="btn btn-primary">Выбрать курс</a>
     }
     else
     {
-        <div class="card-group">
+        <div class="row">
             @foreach (var enrollment in enrollments)
             {
-                <div class="card">
-                    <div class="card-header">
-                        @enrollment.Course.Title
-                    </div>
-                    <div class="card-body">
-                        <p>@enrollment.Course.Category | @enrollment.Course.DurationHours часов</p>
-                        <p class="text-muted small">Записаны: @enrollment.EnrollmentDate.ToString("dd.MM.yyyy")</p>
-                        <div class="mb-2">
-                            <small>Прогресс: @enrollment.ProgressPercentage%</small>
-                            <div class="progress">
-                                <div class="progress-bar" style="width: @enrollment.ProgressPercentage%"></div>
-                            </div>
+                <div class="col-md-6 col-lg-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <strong>@enrollment.Course?.Title</strong>
                         </div>
-                        @if (enrollment.IsCompleted)
-                        {
-                            <span class="badge bg-success">Завершено</span>
-                        }
-                        else
-                        {
-                            <span class="badge bg-warning">В процессе</span>
-                        }
-                    </div>
-                    <div class="card-footer">
-                        <a href="/courses/@enrollment.Course.Id" class="btn btn-primary">Перейти</a>
+                        <div class="card-body">
+                            <p class="text-muted small">@enrollment.Course?.Category | @enrollment.Course?.DurationHours ч</p>
+                            <p class="small mb-2">Записались: @enrollment.EnrollmentDate.ToString("dd.MM.yyyy")</p>
+
+                            @if (enrollment.IsCompleted)
+                            {
+                                <span class="badge bg-success">Завершено</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning">В процессе</span>
+                            }
+                        </div>
+                        <div class="card-footer">
+                            <a href="/courses/@enrollment.Course?.Id" class="btn btn-sm btn-primary">Подробнее</a>
+                            <form method="post" action="/api/unenroll/@enrollment.Id" style="display:inline;">
+                                <AntiforgeryToken />
+                                <button type="submit" class="btn btn-sm btn-danger">Отписаться</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             }
         </div>
     }
 
-    <div class="mt-4">
-        <a href="/courses" class="btn btn-primary">Выбрать еще курсы</a>
-    </div>
+    <hr />
+    <a href="/courses" class="btn btn-outline-primary">К каталогу курсов</a>
 </div>
 
 @code {
@@ -78,7 +74,7 @@
 
         if (user.Identity?.IsAuthenticated == true)
         {
-            userId = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            userId = user.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier);
 
             if (!string.IsNullOrEmpty(userId))
             {
