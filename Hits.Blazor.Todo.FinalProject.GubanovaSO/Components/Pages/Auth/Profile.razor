@@ -1,0 +1,58 @@
+﻿@page "/profile"
+@attribute [Authorize]
+@inject UserManager<ApplicationUser> UserManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<PageTitle>Профиль - Hits.Todo</PageTitle>
+
+<div class="container mt-4">
+    @if (user != null)
+    {
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h3>Мой профиль</h3>
+                        <p><strong>Имя:</strong> @user.UserName</p>
+                        <p><strong>Email:</strong> @user.Email</p>
+                        <p>
+                            <strong>Email подтвержден:</strong>
+                            @if (user.EmailConfirmed)
+                            {
+                                <span class="badge bg-success">Да</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning">Нет</span>
+                            }
+                        </p>
+
+                        <hr />
+
+                        <a href="/courses" class="btn btn-primary">Курсы</a>
+                        <a href="/my-learning" class="btn btn-secondary">Мое обучение</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-danger">Ошибка загрузки профиля</div>
+    }
+</div>
+
+@code {
+    private ApplicationUser? user;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var authUser = authState.User;
+
+        if (authUser.Identity?.IsAuthenticated == true)
+        {
+            user = await UserManager.GetUserAsync(authUser);
+        }
+    }
+}

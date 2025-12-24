@@ -1,0 +1,130 @@
+﻿﻿
+@page "/courses/create"
+@page "/courses/edit/{Id:int}"
+@using Hits.Blazor.Todo.FinalProject.GubanovaSO.Models
+@using Hits.Blazor.Todo.FinalProject.GubanovaSO.Data.Services
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@attribute [Authorize]
+@inject CourseService courseService
+@inject NavigationManager navigate
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+@if (CourseItem != null)
+{
+    <EditForm Model="CourseItem" OnValidSubmit="ValidSubmit" FormName="courseForm">
+
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <h3>@(Id == 0 ? "Новый курс" : "Редактировать курс")</h3>
+
+        <InputNumber @bind-Value="CourseItem.Id" hidden />
+
+        <div class="form-group">
+            <label>Название</label>
+            <InputText @bind-Value="CourseItem.Title" class="form-control" />
+            <ValidationMessage For="() => CourseItem.Title" />
+        </div>
+
+        <div class="form-group">
+            <label>Описание</label>
+            <InputTextArea @bind-Value="CourseItem.Description" class="form-control" rows="3" />
+            <ValidationMessage For="() => CourseItem.Description" />
+        </div>
+
+        <div class="form-group">
+            <label>Содержание курса</label>
+            <InputTextArea @bind-Value="CourseItem.Content" class="form-control" rows="8" />
+            <ValidationMessage For="() => CourseItem.Content" />
+        </div>
+
+        <div class="form-group">
+            <label>Категория</label>
+            <InputText @bind-Value="CourseItem.Category" class="form-control" />
+            <ValidationMessage For="() => CourseItem.Category" />
+        </div>
+
+        <div class="form-group">
+            <label>Часов (1–1000)</label>
+            <InputNumber @bind-Value="CourseItem.DurationHours" class="form-control" />
+            <ValidationMessage For="() => CourseItem.DurationHours" />
+        </div>
+
+        <div class="form-group">
+            <label>Уровень (1–3)</label>
+            <InputNumber @bind-Value="CourseItem.DifficultyLevel" class="form-control" />
+            <ValidationMessage For="() => CourseItem.DifficultyLevel" />
+        </div>
+
+        <button class="btn btn-primary" type="submit">Сохранить</button>
+        <a class="btn btn-secondary" href="/courses">Отмена</a>
+    </EditForm>
+
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    Course? CourseItem { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var userId = authState.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "";
+
+        if (CourseItem == null)
+        {
+            CourseItem = new Course
+            {
+                CreatedDate = DateTime.UtcNow,
+                InstructorId = userId,
+                DurationHours = 1,
+                DifficultyLevel = 1
+            };
+
+            if (Id != 0)
+            {
+                var course = await courseService.GetCourseByIdAsync(Id);
+                if (course != null)
+                {
+                    CourseItem.Id = course.Id;
+                    CourseItem.Title = course.Title;
+                    CourseItem.Description = course.Description;
+                    CourseItem.Content = course.Content;
+                    CourseItem.Category = course.Category;
+                    CourseItem.DurationHours = course.DurationHours;
+                    CourseItem.DifficultyLevel = course.DifficultyLevel;
+                    CourseItem.CreatedDate = course.CreatedDate;
+                    CourseItem.InstructorId = course.InstructorId;
+                }
+            }
+        }
+    }
+
+    async Task ValidSubmit()
+    {
+        if (CourseItem != null)
+        {
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var userId = authState.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "";
+
+            if (Id == 0)
+            {
+                CourseItem.CreatedDate = DateTime.UtcNow;
+                CourseItem.InstructorId = userId;
+                await courseService.CreateCourseAsync(CourseItem);
+            }
+            else
+            {
+                CourseItem.UpdatedDate = DateTime.UtcNow;
+                await courseService.UpdateCourseAsync(CourseItem);
+            }
+            navigate.NavigateTo("/courses");
+        }
+    }
+}

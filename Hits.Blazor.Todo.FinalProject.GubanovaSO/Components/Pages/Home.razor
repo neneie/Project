@@ -1,0 +1,86 @@
+﻿@page "/"
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<PageTitle>Главная - Образовательная платформа</PageTitle>
+
+<AuthorizeView>
+    <Authorized>
+        <h1>Добро пожаловать, @userName!</h1>
+    </Authorized>
+    <NotAuthorized>
+        <h1>Добро пожаловать!</h1>
+    </NotAuthorized>
+</AuthorizeView>
+
+<div class="container">
+    <AuthorizeView>
+        <Authorized>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Мои курсы</h5>
+                        </div>
+                        <div class="card-footer">
+                            <a class="btn btn-primary w-100" href="/my-learning">Перейти</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Все курсы</h5>
+                        </div>
+                        <div class="card-footer">
+                            <a class="btn btn-primary w-100" href="/courses">Перейти</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </Authorized>
+        <NotAuthorized>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Вход</h5>
+                        </div>
+                        <div class="card-footer">
+                            <a class="btn btn-primary w-100" href="/Account/Login">Войти</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Регистрация</h5>
+                        </div>
+                        <div class="card-footer">
+                            <a class="btn btn-primary w-100" href="/Account/Register">Зарегистрироваться</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </NotAuthorized>
+    </AuthorizeView>
+</div>
+
+@code {
+    private string userName = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity?.IsAuthenticated == true)
+        {
+            var email = user.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "";
+            if (!string.IsNullOrEmpty(email))
+            {
+                userName = email.Split('@')[0];
+            }
+        }
+    }
+}
